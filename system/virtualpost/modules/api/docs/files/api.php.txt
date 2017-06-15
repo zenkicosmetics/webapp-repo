@@ -1,0 +1,1021 @@
+<?php
+
+/*
+ * 
+ * 
+ */
+
+
+class API extends MY_Controller {
+
+    public function __construct() {
+        // set error repoting to false for proper formatting of json data
+        error_reporting(0);
+        
+        parent::__construct();
+        
+        $this->load->model('customers/customer_m');
+        $this->load->model('addresses/location_m');
+        $this->load->model('mailbox/postbox_m');
+        $this->load->model('email/email_m');
+        $this->load->model('invoices/pricing_m');
+        $this->load->model('mailbox/postbox_setting_m');
+        $this->load->model('account/account_m');
+        $this->load->model('addresses/customer_location_m');
+        $this->load->model('customers/country_m');
+        $this->load->model('addresses/customers_address_m');
+        $this->load->model('scans/envelope_m');
+        $this->load->model('scans/envelope_pdf_content_m');
+        $this->load->model('cloud/customer_cloud_m');
+        $this->load->model('scans/envelope_file_m');
+        $this->load->model('scans/envelope_completed_m');
+        $this->load->model('mailbox/envelope_customs_m');
+        $this->load->model('mailbox/envelope_customs_detail_m');
+        $this->load->model('scans/envelope_package_m');
+        $this->load->model('payment/payment_m');
+        
+        // load panation
+        $this->load->library("pagination");
+    }
+    
+    /**
+     * Verify Web Services are working.
+     * 
+     * void
+     * 
+     * @return array {'code' => 1000, 'message' => 'Working'}        
+     */
+    public function index()
+    {
+        $data = array(
+                        'code' => 1000,
+                        'message' => 'Working',
+                        'result' => 'index'
+                        );
+        echo json_encode($data,JSON_PRETTY_PRINT);
+        exit;
+    }
+    
+    /**
+     * Check login.
+     * 
+     * If credentials are correct then return authenticated <br>
+     * Else If email exists then return email_exists <br>
+     * Else return invalid_credentials. <br>
+     * 
+     * @uses $_POST['email']
+     * @uses $_POST['password'] 
+     * 
+     * @return array {'code' => 1001, 'message' => 'authenticated', 'result' => array()} or <br>
+     * {'code' => 1002, 'message' => 'email_exists', 'result' => array()} or <br>
+     * {'code' => 1003, 'message' => 'invalid_credentials', 'result' => array()}
+     *         
+     */
+    public function login()
+    {
+        $email = $this->input->get_post('email');
+        $password = $this->input->get_post('password');
+        
+        // Get user information by email and password
+        $customer = $this->customer_m->get_active_customer_by_account($email, md5($password));
+        
+        //if customer is exist and is not deleted yet
+        if ($customer) {
+            $data = array(
+                        'code' => 1001,
+                        'message' => 'authenticated',
+                        'result' => $customer
+                        );
+            echo json_encode($data,JSON_PRETTY_PRINT);
+            exit;
+        } else {
+            // Get user information by email
+            $customer = $this->customer_m->get_active_customer_by_email($email);
+            
+            // If customer email exists
+            if ($customer) {
+                $data = array(
+                        'code' => 1002,
+                        'message' => 'email_exists',
+                        'result' => $customer
+                        );
+                echo json_encode($data,JSON_PRETTY_PRINT);
+                exit;
+            }else{
+                $data = array(
+                        'code' => 1003,
+                        'message' => 'invalid_credentials',
+                        'result' => ''
+                        );
+                echo json_encode($data,JSON_PRETTY_PRINT);
+                exit;
+            }
+        }
+    }
+    
+    /**
+     * Register customer
+     * 
+     * @uses $_POST['email']
+     * @uses $_POST['password']
+     * 
+     * @return array {'code' => 1004, 'message' => 'user_created', 'result' => array()}
+     */
+    public function register() {
+        $email = $this->input->get_post('email');
+        $password = $this->input->get_post('password');
+        $activated_key = APUtils::generateRandom(30);
+        
+        // Insert new customer
+        $customer_id = $this->customer_m->insert(array (
+                "email" => $email,
+                "user_name" => $email,
+                "password" => md5($password),
+                "account_type" => APConstants::FREE_TYPE,
+                "charge_fee_flag" => APConstants::ON_FLAG,
+                "activated_key" => $activated_key,
+                "created_date" => now(),
+                "last_updated_date" => now() 
+        ));
+
+        // Insert default postbox
+        $postbox_id = $this->postbox_m->insert(array (
+                "customer_id" => $customer_id,
+                "postbox_name" => "",
+                "name" => "",
+                "company" => "",
+                "type" => APConstants::FREE_TYPE,
+                "is_main_postbox" => 1 
+        ));
+
+        // Send email confirm for user
+        $email_template = $this->email_m->get_by('slug', APConstants::new_customer_register);
+        $activated_url = base_url() . "customers/active?key=" . $activated_key;
+        $data = array (
+                "full_name" => $email,
+                "email" => $email,
+                "password" => $password,
+                "active_url" => $activated_url,
+                "site_url" => base_url() 
+        );
+        $content = APUtils::parserString($email_template->content, $data);
+        MailUtils::sendEmail('', $this->input->get_post('email'), $email_template->subject, $content);
+        
+        $data = array(
+                        'code' => 1004,
+                        'message' => 'user_created',
+                        'result' => array(
+                                            'customer_id' => $customer_id,
+                                            'postbox_id' => $postbox_id
+                                        )
+                        );
+        echo json_encode($data,JSON_PRETTY_PRINT);
+        exit;
+    }
+    
+    /**
+     * Get all avaialable postbox locations
+     * 
+     * void
+     * 
+     * @return array {'code' => 1005, 'message' => 'list_available_locations', 'result' => array()}
+     */
+    public function all_postbox_locations() {
+
+        $all_locations = $this->location_m->get_all();
+        $data = array(
+                        'code' => 1005,
+                        'message' => 'list_available_locations',
+                        'result' => $all_locations
+                        );
+        echo json_encode($data,JSON_PRETTY_PRINT);
+        exit;
+    }
+    
+    
+    /**
+     * Save postbox name
+     * 
+     * Save postbox name
+     * 
+     * @uses $_POST['email']
+     * @uses $_POST['postbox_name']
+     * @uses $_POST['location_available_id']
+     * @uses $_POST['address_name']
+     * @uses $_POST['address_company_name']
+     * 
+     * @return array {'code' => 1006, 'message' => 'save_postboxname_success', 'result' => array()}
+     */
+    public function save_postboxname() {
+        $email = $this->input->get_post('email');
+        $customer = $this->customer_m->get_active_customer_by_email($email);
+      
+        // New customer
+        $customer_id = $customer->customer_id;
+        // Update main postbox
+        $this->postbox_m->update_by_many(array (
+                "customer_id" => $customer_id,
+                "is_main_postbox" => APConstants::ON_FLAG 
+        ), array (
+                "postbox_name" => $this->input->get_post('postbox_name'),
+                "location_available_id" => $this->input->get_post('location_available_id'),
+                "name" => $this->input->get_post('address_name'),
+                "company" => $this->input->get_post('address_company_name') 
+        ));
+
+        // Update data to customer
+        $this->customer_m->update_by_many(array (
+                "customer_id" => $customer_id 
+        ), array (
+                "postbox_name_flag" => APConstants::ON_FLAG,
+                "name_comp_address_flag" => APConstants::ON_FLAG,
+                "city_address_flag" => APConstants::ON_FLAG 
+        ));
+
+        // Update customer information
+        $this->customer_m->update_by_many(array (
+                "customer_id" => $customer_id,
+                "shipping_address_completed" => APConstants::ON_FLAG,
+                "invoicing_address_completed" => APConstants::ON_FLAG,
+                "postbox_name_flag" => APConstants::ON_FLAG,
+                "name_comp_address_flag" => APConstants::ON_FLAG,
+                "city_address_flag" => APConstants::ON_FLAG,
+                "payment_detail_flag" => APConstants::ON_FLAG,
+                "email_confirm_flag" => APConstants::ON_FLAG,
+				"accept_terms_condition_flag" => APConstants::ON_FLAG 
+        ), array (
+                "activated_flag" => APConstants::ON_FLAG,
+                "last_updated_date" => now() 
+        ));
+
+        $data = array(
+                        'code' => 1006,
+                        'message' => 'save_postboxname_success',
+                        'result' => ''
+                        );
+        echo json_encode($data,JSON_PRETTY_PRINT);
+        exit;
+    }
+    
+    /**
+    * Add postbox.
+    *
+    * adds a postbox to customer account.
+    *
+    * @uses $_POST['email']
+    * @uses $_POST['location']
+    * @uses $_POST['postboxname']
+    * @uses $_POST['accounttype']
+    * @uses $_POST['customername']
+    * @uses $_POST['companyname']
+    * 
+    * @return array {'code' => 1007, 'message' => 'postbox_added', 'result' => array()}
+    */
+    public function add_postbox() {
+        $email = $this->input->get_post('email');
+        $customer = $this->customer_m->get_active_customer_by_email($email);
+
+        $customer_id = $customer->customer_id;
+        $location = $this->input->get_post('location');
+        $postname = $this->input->get_post('postboxname');
+        $account_type = $this->input->get_post('accounttype');
+        $custname = $this->input->get_post('customername');
+        $company = $this->input->get_post('companyname');
+        
+        
+        $apply_date = null;
+                if ($account_type === APConstants::PRIVATE_TYPE || $account_type === APConstants::BUSINESS_TYPE) {
+                    $apply_date = APUtils::getCurrentYearMonthDate();
+                }
+                
+        $postbox_id = $this->postbox_m->insert(array (
+                        'customer_id' => $customer_id,
+                        'location_available_id' => $location,
+                        'postbox_name' => $postname,
+                        'type' => $account_type,
+                        'name' => $custname,
+                        'company' => $company,
+                        'apply_date' => $apply_date 
+                ));
+                
+                // Update account type
+                APUtils::updateAccountType($customer_id);
+                
+                $data = array(
+                        'code' => 1007,
+                        'message' => 'postbox_added',
+                        'result' => $postbox_id
+                        );
+                echo json_encode($data,JSON_PRETTY_PRINT);
+                exit;
+    }
+    
+    /**
+     * Save shipment and invoice address.
+     * 
+     * add shipment and invoice address to customer account.
+     * 
+     * @uses $_POST['email']
+     * @uses $_POST['shipment_address_name']
+     * @uses $_POST['shipment_company']
+     * @uses $_POST['shipment_street']
+     * @uses $_POST['shipment_postcode']
+     * @uses $_POST['shipment_city']
+     * @uses $_POST['shipment_region']
+     * @uses $_POST['shipment_country']
+     * @uses $_POST['invoicing_address_name']
+     * @uses $_POST['invoicing_company']
+     * @uses $_POST['invoicing_street']
+     * @uses $_POST['invoicing_postcode']
+     * @uses $_POST['invoicing_city']
+     * @uses $_POST['invoicing_region']
+     * @uses $_POST['invoicing_country']
+     * 
+     * @return array {'code' => 1008, 'message' => 'shipping_invocing_address_added', 'result' => array()}
+     */
+    public function save_address() {
+        $email = $this->input->get_post('email');
+        $customer = $this->customer_m->get_active_customer_by_email($email);
+        $customer_id = $customer->customer_id;
+        
+        $shipment_address_name = $this->input->get_post('shipment_address_name');
+        $shipment_company = $this->input->get_post('shipment_company');
+        $shipment_street = $this->input->get_post('shipment_street');
+        $shipment_postcode = $this->input->get_post('shipment_postcode');
+        $shipment_city = $this->input->get_post('shipment_city');
+        $shipment_region = $this->input->get_post('shipment_region');
+        $shipment_country = $this->input->get_post('shipment_country');
+        $invoicing_address_name = $this->input->get_post('invoicing_address_name');
+        $invoicing_company = $this->input->get_post('invoicing_company');
+        $invoicing_street = $this->input->get_post('invoicing_street');
+        $invoicing_postcode = $this->input->get_post('invoicing_postcode');
+        $invoicing_city = $this->input->get_post('invoicing_city');
+        $invoicing_region = $this->input->get_post('invoicing_region');
+        $invoicing_country = $this->input->get_post('invoicing_country');
+        
+        // Gets customer address infor.
+        $check = $this->customers_address_m->get_by('customer_id', $customer_id);
+   
+        if ($check) {
+            // Get country entity
+            $shipment_country_entity = $this->country_m->get($shipment_country);
+            //$invoicing_country_entity = $this->country_m->get($invoicing_country);
+
+
+            // update address information.
+            $data = array (
+                    'shipment_address_name' => $shipment_address_name,
+                    'shipment_company' => $shipment_company,
+                    'shipment_street' => $shipment_street,
+                    'shipment_postcode' => $shipment_postcode,
+                    'shipment_city' => $shipment_city,
+                    'shipment_region' => $shipment_region,
+                    'shipment_country' => $shipment_country,
+                    'invoicing_address_name' => $invoicing_address_name,
+                    'invoicing_company' => $invoicing_company,
+                    'invoicing_street' => $invoicing_street,
+                    'invoicing_postcode' => $invoicing_postcode,
+                    'invoicing_city' => $invoicing_city,
+                    'invoicing_region' => $invoicing_region,
+                    'invoicing_country' => $invoicing_country,
+                    'eu_member_flag' => $shipment_country_entity->eu_member_flag 
+            );
+
+            // Ticket #361 (If the customer changes the invoicing company name
+            // the VAT check has to be redone, therefore the sign erased.
+            if ($invoicing_company != $check->invoicing_company) {
+                // Update VAT sign (reset vat number in customers)
+                $this->customer_m->update_by_many(array (
+                        "customer_id" => $customer_id 
+                ), array (
+                        "vat_number" => '' 
+                ));
+
+                // Reload customers information
+                APContext::reloadCustomerLoggedIn();
+            }
+
+            $this->customers_address_m->update($customer_id, $data);
+
+            // Update data to customer
+            $this->customer_m->update_by_many(array (
+                    "customer_id" => $customer_id 
+            ), array (
+                    "shipping_address_completed" => APConstants::ON_FLAG,
+                    "invoicing_address_completed" => APConstants::ON_FLAG 
+            ));
+
+            // Update customer information
+            $this->customer_m->update_by_many(array (
+                    "customer_id" => $customer_id,
+                    "shipping_address_completed" => APConstants::ON_FLAG,
+                    "invoicing_address_completed" => APConstants::ON_FLAG,
+                    "postbox_name_flag" => APConstants::ON_FLAG,
+                    "name_comp_address_flag" => APConstants::ON_FLAG,
+                    "city_address_flag" => APConstants::ON_FLAG,
+                    "payment_detail_flag" => APConstants::ON_FLAG,
+                    "email_confirm_flag" => APConstants::ON_FLAG ,
+					"accept_terms_condition_flag" => APConstants::ON_FLAG
+            ), array (
+                    "activated_flag" => APConstants::ON_FLAG 
+            ));
+        }else{
+            // Get country entity
+            $shipment_country_entity = $this->country_m->get($shipment_country);
+            $eu_member_flag = 0;
+            if ($shipment_country_entity) {
+                $eu_member_flag = $shipment_country_entity->eu_member_flag;
+            }
+
+            // insert new address information.
+            $data = array (
+                    'customer_id' => $customer_id,
+                    'shipment_address_name' => $shipment_address_name,
+                    'shipment_company' => $shipment_company,
+                    'shipment_street' => $shipment_street,
+                    'shipment_postcode' => $shipment_postcode,
+                    'shipment_city' => $shipment_city,
+                    'shipment_region' => $shipment_region,
+                    'shipment_country' => $shipment_country,
+                    'invoicing_address_name' => $invoicing_address_name,
+                    'invoicing_company' => $invoicing_company,
+                    'invoicing_street' => $invoicing_street,
+                    'invoicing_postcode' => $invoicing_postcode,
+                    'invoicing_city' => $invoicing_city,
+                    'invoicing_region' => $invoicing_region,
+                    'invoicing_country' => $invoicing_country,
+                    'eu_member_flag' => $eu_member_flag
+            );
+            $cm_add = $this->customers_address_m->insert($data);
+
+            // Update data to customer
+            $cm_upd = $this->customer_m->update_by_many(array (
+                    "customer_id" => $customer_id 
+            ), array (
+                    "shipping_address_completed" => APConstants::ON_FLAG,
+                    "invoicing_address_completed" => APConstants::ON_FLAG 
+            ));
+
+            // Update customer information
+            $cm_upd2 = $this->customer_m->update_by_many(array (
+                    "customer_id" => $customer_id,
+                    "shipping_address_completed" => APConstants::ON_FLAG,
+                    "invoicing_address_completed" => APConstants::ON_FLAG,
+                    "postbox_name_flag" => APConstants::ON_FLAG,
+                    "name_comp_address_flag" => APConstants::ON_FLAG,
+                    "city_address_flag" => APConstants::ON_FLAG,
+                    "payment_detail_flag" => APConstants::ON_FLAG,
+                    "email_confirm_flag" => APConstants::ON_FLAG,
+					"accept_terms_condition_flag" => APConstants::ON_FLAG
+            ), array (
+                    "activated_flag" => APConstants::ON_FLAG 
+            ));
+            
+        }
+        
+        $data = array(
+                        'code' => 1008,
+                        'message' => 'shipping_invocing_address_added',
+                        'result' => ''
+                        );
+        echo json_encode($data,JSON_PRETTY_PRINT);
+        exit;
+    }
+    
+    /**
+     * Forfot password
+     * 
+     * Checks if customer email exists and is not deleted then generate random password and email to customer.
+     * 
+     * @uses $_POST['email']
+     * 
+     * @return array {'code' => 1009, 'message' => 'customer_not_register', 'result' => array()} *or* <br>
+     * {'code' => 1010, 'message' => 'customer_deleted', 'result' => array()} *or* <br>
+     * {'code' => 1011, 'message' => 'Email containing temporary password sent', 'result' => array()} *or* <br>
+     * {'code' => 1012, 'message' => 'Email not sent', 'result' => array()}
+     */
+    public function forgot_pass() {
+        
+        $customer = new stdClass();
+        $customer->email = '';
+
+        $email = $this->input->post('email');
+
+        // Get user information by email
+        $customer = $this->customer_m->get_by_many(array (
+                "email" => $email 
+        ));
+
+        // Check if customer is not registered
+        if (empty($customer)) {
+            $data = array(
+                'code' => 1009,
+                'message' => 'customer_not_register',
+                'result' => 'error'
+                );
+            echo json_encode($data,JSON_PRETTY_PRINT);
+            exit;
+        }
+
+        // Check if customer is delete
+        if ($customer->status == '1') {
+            $data = array(
+                'code' => 1010,
+                'message' => 'customer_deleted',
+                'result' => 'error'
+                );
+            echo json_encode($data,JSON_PRETTY_PRINT);
+            exit;
+        }
+
+        // Reset password
+        $new_pass = APUtils::generateRandom(8);
+        $this->customer_m->update_by_many(array (
+                "email" => $email 
+        ), array (
+                "password" => md5($new_pass) 
+        ));
+
+        // Build email content
+        $from_email = '';
+        $to_email = $email;
+        // Send email confirm for user
+        $email_template = $this->email_m->get_by('slug', APConstants::customer_reset_password);
+        $data = array (
+                "full_name" => $this->input->get_post('email'),
+                "email" => $this->input->get_post('email'),
+                "password" => $new_pass,
+                "site_url" => base_url() 
+        );
+        $content = APUtils::parserString($email_template->content, $data);
+        $subject = $email_template->subject;
+
+        // Call API to send email
+        $sent_status = MailUtils::sendEmail($from_email, $to_email, $subject, $content);
+
+        if($sent_status){
+            $code = 1011;
+            $message = 'Email containing temporary password sent';
+        }else{
+            $code = 1012;
+            $message = 'Email not sent';
+        }
+
+        $data = array(
+                'code' => $code,
+                'message' => $message,
+                'result' => $sent_status
+                );
+        echo json_encode($data,JSON_PRETTY_PRINT);
+        exit;        
+    }
+    
+    
+    /**
+     * Check Registration Status
+     * 
+     * Check if customer is active, filled shipping address, invoicing address, postbox name,
+     * company address, city, payment details and verified email address.
+     * 
+     * @uses $_POST['email']
+     * 
+     * @return array {'code' => 1013, 'message' => 'registration_status', 'result' => array()}
+     */
+    public function check_registration_status(){
+        $email = $this->input->get_post('email');
+        $customer = $this->customer_m->get_active_customer_by_email($email);
+
+        $status = array();
+        if ($customer->activated_flag == '1'){
+            $status['activated_flag'] = "activated";
+        } else {
+            $status['activated_flag'] = "not_activated";
+        }
+        if ($customer->shipping_address_completed === '1') {
+            $status['shipping_address_completed'] = "completed";
+        } else {
+            $status['shipping_address_completed'] = "not_completed";
+        } 
+        if ($customer->invoicing_address_completed === '1') {
+            $status['invoicing_address_completed'] = "completed";
+        } else {
+            $status['invoicing_address_completed'] = "not_completed";
+        }
+        if ($customer->postbox_name_flag === '1') {
+        } else {
+            $status['postbox_name_flag'] = "not_completed";
+        }
+        if ($customer->name_comp_address_flag === '1') {
+            $status['name_comp_address_flag'] = "completed";
+        } else {
+            $status['name_comp_address_flag'] = "not_completed";
+        }
+        if ($customer->city_address_flag === '1') {
+            $status['city_address_flag'] = "completed";
+        } else {
+            $status['city_address_flag'] = "not_completed";
+        } if ($customer->payment_detail_flag === '1') {
+            $status['payment_detail_flag'] = "completed";
+        } else {
+            $status['payment_detail_flag'] = "not_completed";
+        }
+        if ($customer->email_confirm_flag === '1') {
+            $status['email_confirm_flag'] = "completed";
+        } else {
+            $status['email_confirm_flag'] = "not_completed";
+        }
+
+        $data = array(
+                        'code' => 1013,
+                        'message' => 'registration_status',
+                        'result' => $status
+                        );
+        echo json_encode($data,JSON_PRETTY_PRINT);
+        exit;
+    }
+    
+    
+    
+    /**
+     * Load envelope information based on input parameters.
+     * 
+     * work to be done....
+     * 
+     * @uses $_POST['p']
+     * @uses $_POST['skip']
+     * @uses $_POST['first_regist']
+     * @uses $_POST['declare_customs']
+     * @uses $_POST['search_type']
+     * @uses $_POST['base_url']
+     * @uses $_POST['fullTextSearchFlag']
+     * @uses $_POST['fullTextSearchValue']
+     * @uses $_POST['start']
+     * @uses $_POST['limit']
+     * 
+     * @return array {'code' => 10.., 'message' => '', 'result' => array()}
+     */
+    public function load_envelope() {
+        
+        // Get post box id
+        $postbox_id = $this->input->get_post('p');
+        $skip = $this->input->get_post('skip');
+        $first_regist = $this->input->get_post('first_regist');
+        $declare_customs = $this->input->get_post('declare_customs');
+        $search_type = $this->input->get_post('search_type');
+        $base_url = $this->input->get_post('base_url');
+           
+        $fullTextSearchFlag = $this->input->get_post('fullTextSearchFlag');
+        $fullTextSearchValue = $this->input->get_post('fullTextSearchValue');
+        
+//        if (empty($postbox_id) && $fullTextSearchFlag != '1') {
+//            redirect('mailbox/' . $this->method . '?p=' . $this->get_first_postbox() . '&skip=' . $skip . '&first_regist=' . $first_regist);
+//        }
+        $start = $this->input->get_post('start');
+        $limit = $this->input->get_post('limit');
+        
+        if (empty($start)) {
+            $start = 0;
+        }
+        if (empty($limit)) {
+            $limit = APContext::getPagingSetting(); // APConstants::DEFAULT_PAGE_ROW;
+        }
+     
+        // update limit into user_paging.
+        APContext::updatePagingSetting($limit);
+        
+        $email = $this->input->get_post('email');
+        $customer = $this->customer_m->get_active_customer_by_email($email);
+        $customer_id = $customer->customer_id;
+    
+        $activated_flag = $customer->activated_flag;
+        if ($activated_flag == '1') {
+
+            // Fulltext search case
+            if ($fullTextSearchFlag == '1') {
+                // Reset postbox_id
+                $p = '';
+                $postbox_id = '';
+                
+                $list_envelopes = $this->envelope_pdf_content_m->get_many_by_many(array (
+                        "pdf_content LIKE '%" . $fullTextSearchValue . "%' OR envelope_content LIKE '%" . $fullTextSearchValue . "%'" => null 
+                ), $start, $limit);
+                
+                if ($list_envelopes && count($list_envelopes) > 0) {
+                    $list_envelope_id = array ();
+                    foreach ( $list_envelopes as $envelope ) {
+                        $list_envelope_id [] = $envelope->envelope_id;
+                    }
+                    $arr_envelope_id = implode(',', $list_envelope_id);
+                    $ouput = $this->envelope_m->get_envelope_paging(array (
+                            "to_customer_id" => $customer_id,
+                            "envelopes.id IN (" . $arr_envelope_id . ')' => null 
+                    ), 0, $limit, 'incomming_date', 'DESC');
+                }
+                else {
+                    $ouput = array (
+                            'total' => 0,
+                            'data' => array () 
+                    );
+                }
+            }
+            // Select case
+            else {
+                // Truong hop ma new
+                if ($search_type == 0) {
+                    $ouput = $this->envelope_m->get_envelope_paging(array (
+                            "postbox_id" => $postbox_id,
+                            "to_customer_id" => $customer_id,
+                            "trash_flag IS NULL" => null 
+                    ), $start, $limit, 'incomming_date', 'DESC');
+                }
+                // Truong hop ma new
+                else if ($search_type == 1) {
+                    $ouput = $this->envelope_m->get_envelope_paging(array (
+                            "postbox_id" => $postbox_id,
+                            "to_customer_id" => $customer_id,
+                            "completed_flag" => APConstants::OFF_FLAG,
+                            "(envelope_scan_flag IS NULL OR envelope_scan_flag = '0')" => null,
+                            "(item_scan_flag IS NULL OR item_scan_flag = '0')" => null,
+                            "(direct_shipping_flag IS NULL OR direct_shipping_flag = '0')" => null,
+                            "(collect_shipping_flag IS NULL OR collect_shipping_flag = '0')" => null,
+                            "trash_flag IS NULL" => null 
+                    ), $start, $limit, 'incomming_date', 'DESC');
+                }
+                // Truong hop hien thi envelope scan
+                else if ($search_type == 2) {
+                    $ouput = $this->envelope_m->get_envelope_paging(array (
+                            "postbox_id" => $postbox_id,
+                            "to_customer_id" => $customer_id,
+                            "envelope_scan_flag" => APConstants::ON_FLAG,
+                            "trash_flag IS NULL" => null 
+                    ), $start, $limit, 'incomming_date', 'DESC');
+                }
+                // Truong hop hien thi item scan
+                else if ($search_type == 3) {
+                    $ouput = $this->envelope_m->get_envelope_paging(array (
+                            "postbox_id" => $postbox_id,
+                            "to_customer_id" => $customer_id,
+                            "item_scan_flag" => APConstants::ON_FLAG,
+                            "trash_flag IS NULL" => null 
+                    ), $start, $limit, 'incomming_date', 'DESC');
+                    $this->update_new_notification_flag($customer_id, $postbox_id);
+                }
+                // Truong hop hien thi send out (direct or collect shipment)
+                else if ($search_type == 4) {
+                    $ouput = $this->envelope_m->get_envelope_paging(array (
+                            "postbox_id" => $postbox_id,
+                            "to_customer_id" => $customer_id,
+                            "(direct_shipping_flag = 1 OR collect_shipping_flag = 1)" => null,
+                            "trash_flag IS NULL" => null 
+                    ), $start, $limit, 'incomming_date', 'DESC');
+                    $this->update_new_notification_flag($customer_id, $postbox_id);
+                }
+                // Truong hop hien thi trash item
+                else if ($search_type == 5) {
+                    $ouput = $this->envelope_m->get_envelope_paging(array (
+                            "postbox_id" => $postbox_id,
+                            "to_customer_id" => $customer_id,
+                            "trash_flag IS NOT NULL" => null 
+                    ), $start, $limit, 'incomming_date', 'DESC');
+                }
+                // Truong hop hien thi storage item
+                else if ($search_type == 6) {
+                    $ouput = $this->envelope_m->get_envelope_paging(array (
+                            "postbox_id" => $postbox_id,
+                            "to_customer_id" => $customer_id,
+                            "storage_flag" => APConstants::ON_FLAG,
+                            "(trash_flag IS NULL OR trash_flag = '0')" => NULL,
+                            "(direct_shipping_flag IS NULL OR direct_shipping_flag = '0')" => NULL,
+                            "(collect_shipping_flag IS NULL OR collect_shipping_flag = '0')" => NULL 
+                    ), $start, $limit, 'incomming_date', 'DESC');
+                }
+                
+                // Load all pending envelope need to declare customs
+                $pending_envelope_customs = $this->envelope_customs_m->get_by_many(array (
+                        "customer_id" => $customer_id,
+                        "process_flag" => APConstants::OFF_FLAG 
+                ));
+            }
+        }
+        else {
+            $ouput = array (
+                    'total' => 0,
+                    'data' => array () 
+            );
+        }
+        
+        // Total record
+        $total = $ouput ['total'];
+        $envelopes = $ouput ['data'];
+        
+        // config panation.
+        $config = array ();
+        $config ["base_url"] = $base_url;
+        $config ["total_rows"] = $total;
+        $config ["per_page"] = $limit;
+        $config ["uri_segment"] = APConstants::PANATION_URI_SEGMET;
+        $choice = $config ["total_rows"] / $config ["per_page"];
+        
+        $this->pagination->initialize($config);
+        $page = ($this->uri->segment(APConstants::PANATION_URI_SEGMET)) ? $this->uri->segment(APConstants::PANATION_URI_SEGMET) : 0;
+        
+        // Ouput data to view
+        if (empty($skip)) {
+            $skip = 0;
+        }
+        
+        // Load payment information
+        $payment_count = $this->payment_m->count_by_many(array (
+                "customer_id" => $customer_id 
+        ));
+        $payment_exist = APConstants::OFF_FLAG;
+        if ($payment_count > 0) {
+            $payment_exist = APConstants::ON_FLAG;
+        }
+        
+        print_r($ouput);
+        exit;
+        $data = array(
+                        'code' => 100,
+                        'message' => '',
+                        'result' => ''
+                        );
+        echo json_encode($data,JSON_PRETTY_PRINT);
+        exit;
+    }
+    
+    
+    /**
+     * Add new payment method.
+     * 
+     * work to be done....
+     * 
+     * @uses $_POST['account_type']
+     * @uses $_POST['card_type']
+     * @uses $_POST['card_number']
+     * @uses $_POST['card_name']
+     * @uses $_POST['cvc']
+     * @uses $_POST['expired_year']
+     * @uses $_POST['expired_month']
+     * 
+     * @return array {'code' => 10.., 'message' => '', 'result' => array()}
+     */
+    public function add_payment_method() {
+        
+        if ($_POST) {
+            
+            $account_type = $this->input->post('account_type');
+            $card_type = $this->input->post('card_type');
+            $card_number = $this->input->post('card_number');
+            $card_name = $this->input->post('card_name');
+            $cvc = $this->input->post('cvc');
+            $expired_year = $this->input->post('expired_year');
+            $expired_month = $this->input->post('expired_month');
+                
+            // Payment already confirm
+            $callback_tran_id = $customer_id . '_' . APUtils::generateRandom(32);
+
+            // Insert data to database
+            $primary_card = APConstants::OFF_FLAG;
+            if (empty($payment_check)) {
+                $primary_card = APConstants::ON_FLAG;
+            }
+            $this->payment_m->insert(array (
+                    "account_type" => $account_type,
+                    "card_type" => $card_type,
+                    "card_number" => $card_number,
+                    "card_name" => $card_name,
+                    "cvc" => $cvc,
+                    "expired_year" => $expired_year,
+                    "expired_month" => $expired_month,
+                    "customer_id" => $customer_id,
+                    "card_confirm_flag" => APConstants::OFF_FLAG,
+                    "pseudocardpan" => $pseudocardpan,
+                    "callback_tran_id" => $callback_tran_id,
+                    "primary_card" => $primary_card 
+            ));
+
+            // Make request to create payment
+            $expired = $expired_year . $expired_month;
+
+
+            $redirecturl = $this->make_default_payment($pseudocardpan, $callback_tran_id, $customer->email, $callback_tran_id);
+            if (empty($redirecturl)) {
+                log_message(APConstants::LOG_DEBUG, ">>> Customer ID: " . $customer_id . " call ADD payment method. Redirect URL is empty");
+
+                // Add payment library and make pending payment history
+                $this->load->library('payone');
+                $open_balance = APUtils::getCurrentBalance($customer_id);
+                $payment_result = false;
+                if ($open_balance > 0.1) {
+                    $payment_result = $this->payone->make_pending_payment($customer_id, $callback_tran_id);
+                } else {
+                    $payment_result = true;
+                }
+
+                // If make payment successfully
+                if ($payment_result) {
+                    // Update data to customer
+                    $this->customer_m->update_by_many(array (
+                            "customer_id" => $customer_id 
+                    ), array (
+                            "payment_detail_flag" => APConstants::ON_FLAG 
+                    ));
+
+                    // Update credit card status
+                    $this->payment_m->update_by_many(array (
+                            "customer_id" => $customer_id,
+                            "callback_tran_id" => $callback_tran_id 
+                    ), array (
+                            "account_type" => $account_type,
+                            "card_type" => $card_type,
+                            "card_number" => $card_number,
+                            "card_name" => $card_name,
+                            "cvc" => $cvc,
+                            "expired_year" => $expired_year,
+                            "expired_month" => $expired_month,
+                            "pseudocardpan" => $pseudocardpan,
+                            "card_confirm_flag" => APConstants::ON_FLAG 
+                    ));
+
+                    // Set primary card
+                    $payments = $this->payment_m->get_many_by_many(array (
+                            'customer_id' => $customer_id,
+                            "primary_card" => APConstants::ON_FLAG 
+                    ));
+                    if (count($payments) == 0) {
+                        $this->payment_m->update_by_many(array (
+                                "customer_id" => $customer_id,
+                                'payment_id' => $payments [0]->payment_id 
+                        ), array (
+                                "primary_card" => APConstants::ON_FLAG 
+                        ));
+                    }
+
+                    // If open balance less than 0.1 will activated customer now
+                    if ($open_balance <= 0.1) {
+                        // Only reactivate if deactivated_type = auto
+                        if ($customer->deactivated_type == APConstants::AUTO_INACTIVE_TYPE || empty($customer->deactivated_type)) {
+                            // Update customer information
+                            $this->customer_m->update_by_many(array (
+                                    "customer_id" => $customer_id,
+                                    "shipping_address_completed" => APConstants::ON_FLAG,
+                                    "invoicing_address_completed" => APConstants::ON_FLAG,
+                                    "postbox_name_flag" => APConstants::ON_FLAG,
+                                    "name_comp_address_flag" => APConstants::ON_FLAG,
+                                    "city_address_flag" => APConstants::ON_FLAG,
+                                    "payment_detail_flag" => APConstants::ON_FLAG,
+                                    "email_confirm_flag" => APConstants::ON_FLAG,
+									"accept_terms_condition_flag" => APConstants::ON_FLAG
+                            ), array (
+                                    "activated_flag" => APConstants::ON_FLAG
+                            ));
+                            APContext::reloadCustomerLoggedIn();
+                        }
+                    }
+                }
+            }
+            else {
+                log_message(APConstants::LOG_DEBUG, ">>> Customer ID: " . $customer_id . " call ADD payment method. Redirect URL is not empty:" . $redirecturl);
+                if ($redirecturl != 'ERROR') {
+                    echo json_encode(array (
+                            'status' => true,
+                            'redirect' => true,
+                            'message' => $redirecturl 
+                    ));
+                }
+                else {
+                    // Delete card on database
+                    $this->payment_m->delete_by_many(array (
+                            "account_type" => $account_type,
+                            "card_type" => $card_type,
+                            "card_number" => $card_number,
+                            "card_confirm_flag" => APConstants::OFF_FLAG,
+                            "customer_id" => $customer_id,
+                            "callback_tran_id" => $callback_tran_id 
+                    ));
+                    $message = lang('add_payment_fail');
+                    echo json_encode(array (
+                            'status' => false,
+                            'redirect' => false,
+                            'message' => $message 
+                    ));
+                }
+                return;
+            }
+
+            $message = lang('add_payment_success');
+            $this->success_output($message);
+            $data = array(
+                        'code' => 100,
+                        'message' => '',
+                        'result' => ''
+                        );
+            echo json_encode($data,JSON_PRETTY_PRINT);
+            exit;
+           
+        }
+    }
+}
+?>
+

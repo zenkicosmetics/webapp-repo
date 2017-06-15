@@ -1,0 +1,1 @@
+<p>The payment request has failed, please contact the administrator.</p>

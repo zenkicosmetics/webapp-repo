@@ -1,0 +1,3 @@
+INSERT INTO `settings` (`SettingCode`, `DefaultValue`, `ActualValue`, `LabelValue`, `ModuleName`, `SettingOrder`, `IsRequired`, `Alias01`, `Alias02`, `Alias03`, `Alias04`, `Alias05`, `description`, `created_date`, `created_by_type`, `created_by_id`, `last_modified_date`, `last_modified_by_type`, `last_modified_by_id`, `deleted_flag`) VALUES
+('000240', '4x6', '4x6', '4x6', NULL, 2, NULL, NULL, NULL, NULL, NULL, NULL, 'Canada post label size', NULL, 0, 0, NULL, 0, 0, 0),
+('000240', '8.5x11', '8.5x11', '8.5x11', NULL, 3, NULL, NULL, NULL, NULL, NULL, NULL, 'Canada post label size', NULL, 0, 0, NULL, 0, 0, 0);

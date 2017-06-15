@@ -1,0 +1,1 @@
+ALTER TABLE  `location` ADD  `next_pricing_template_id` INT NULL DEFAULT NULL AFTER  `pricing_template_id` ;

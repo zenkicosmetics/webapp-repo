@@ -1,0 +1,75 @@
+@CHARSET "UTF-8";
+
+/* --------------------------------------------------------------
+    layout
+-------------------------------------------------------------- */
+.ui-layout-pane { /* all 'panes' */ 
+	background: #f2f2f2; 
+	border: 0px solid #BBB; 
+	/*padding: 10px;
+	overflow: auto;*/ 
+}
+.ui-layout-resizer { /* all 'resizer-bars' */ 
+	background: #f2f2f2; 
+}
+.ui-layout-toggler { /* all 'toggler-buttons' */ 
+	background: #AAA; 
+}
+.ui-layout-pane-center{
+	overflow: auto;
+width:1100px;
+	back-ground:none repeat scroll 0 0 #F6F6F6;
+	border-bottom: 0 none;
+	border-left: 0 none;
+	border-top: 0 none;
+	z-index: 50;
+}
+.ui-layout-pane-west{
+	overflow-x: hidden;
+	overflow-y: auto;
+	border-bottom: 0 none;
+	background:none repeat scroll 0 0 #eAeAeA;
+}
+.ui-layout-pane-south{
+	height:100%;
+	z-index:9999
+}
+.ui-layout-pane-east{
+	height:100%;
+	z-index:1;
+	left:-100px;
+}
+.ui-layout-pane-east{
+	background: none repeat scroll 0 0 #F1F1F1;
+    border-bottom: 1px solid #D5D5D5;
+	border-top: 1px solid #D5D5D5;
+	border-right: 1px solid #D5D5D5;
+    border-left: 1px solid #D5D5D5;
+    position: absolute;
+    /*top: 0;
+	bottom: 0;*/
+    width: 182px;
+    z-index: 1;
+	/*top: 92px;*/
+}
+.ui-layout-pane-east section{
+	padding-bottom:40px;
+}
+.ui-layout-pane-east section{
+	padding-bottom:40px;
+}
+
+.ui-layout-pane-east  h3{
+	color:#6c6c6c;
+	font-size:14px;
+	margin-bottom:15px;
+	margin-top:30px;
+}
+
+.ui-layout-pane-east .box-item{
+	background: none repeat scroll 0 0 #F7F7F7;
+    border: 1px solid #DADADA;
+	border-bottom: 0 none;
+}
+
+

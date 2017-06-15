@@ -1,0 +1,1 @@
+ALTER TABLE `cases_service_partner` CHANGE `id` `partner_id` INT(12) NULL  COMMENT 'id of partner_partner';

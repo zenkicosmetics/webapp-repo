@@ -1,0 +1,1 @@
+ALTER TABLE `envelopes` ADD `prepare_shipping_flag` TINYINT NULL DEFAULT NULL COMMENT 'To mark the envelope line selected in the popup Prepare Shipping.' AFTER `collect_shipping_date` ;

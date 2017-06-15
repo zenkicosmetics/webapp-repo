@@ -1,0 +1,1 @@
+ALTER TABLE `location` ADD `office_space_active_flag` TINYINT(2) NULL DEFAULT '0' AFTER `business_postbox_text`;

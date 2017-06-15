@@ -1,0 +1,122 @@
+@charset "utf-8";
+/*
+* Css for check item pages
+*/
+.ui-layout-pane {
+    background: #fff none repeat scroll 0 0 !important;
+}
+
+.ui-state-default, .ui-widget-content .ui-state-default, .ui-widget-header .ui-state-default {
+    background-color: #dbe9f4 !important;
+    /*background-image: none !important;*/
+    background-image: -moz-linear-gradient(center top , #fbfbfb, #eaeaea);
+    border: 1px solid #dadada;
+    box-shadow: none !important;
+    color: #6c6c6c;
+    font-size: 13px;
+    font-weight: bold;
+}
+div#gview_dataGridResult .ui-state-default, #dataGridPager {
+    background-color: #dbe9f4 !important;
+    background-image: none !important;
+    
+    box-shadow: none !important;
+    color: #6c6c6c;
+    font-size: 13px;
+    font-weight: bold;
+} 
+.title{
+    background-color: #dbe9f4 !important;
+}
+
+.actionButton {
+	background: #dbe9f4;
+	padding: 4px 8px !important;
+	border: solid 1px #bebebe !important;
+	width:180px !important;
+	cursor: pointer !important;
+        color:  #000;
+        font-size: 16px;
+        height: 36px;
+}
+a.achange{
+	text-decoration:none;
+	background: #dbe9f4;
+	font-size:11px;
+	padding: 4px 14px;
+	border: none;
+	border-radius: 4px;
+	width: 140px;
+	color: #000;
+}
+#searchButton {
+	border:solid 1px #bebebe !important;
+	background:#fecd08 !important;
+	color:#000 !important;
+	border: none !important;
+	border-radius: 4px !important;
+	padding: 6px 6px !important;
+}
+
+#item_update {
+    border:solid 1px #bebebe;
+    background:#fecd08;
+    color:#000;
+    border: none;
+    border-radius: 4px;
+    padding: 4px 9px;
+    cursor:pointer;
+    float: right;
+    margin-right: 13px;
+}
+
+#item_id {
+    border: 1px solid #bebebe;
+    border-radius: 2px;
+    height: 28px;
+    width: 258px;
+}
+
+#tracking_number, #item_from {
+    border: 1px solid #bebebe;
+    border-radius: 2px;
+    height: 28px;
+    width: 324px;
+	
+}
+.dimension {    
+    border: 1px solid #bebebe !important;
+    border-radius: 2px !important;
+    height: 28px !important;
+    width: 69px !important;
+}
+
+#item_weight{
+    width: 92px !important;
+}
+
+#shipping_services {
+    border: 1px solid #bebebe;
+    width: 326px !important;
+    height:28px;
+}
+#Table_01 {
+    margin-top: 0px;
+}
+#Table_01 th, #Table_01 td {
+    line-height: 1.5em;
+    padding: 0;
+    vertical-align: middle;
+    font-size: 12px;
+    font-weight: 500;
+    font-family: arial,helvetica,sans-serif;
+}
+#Table_03 th, #Table_03 td{
+    vertical-align: middle;
+    text-align: center;
+}
+
+/* *************CSS Override************************/
+input.input-btn-disable{
+    color:#B5B5B5;
+}

@@ -1,0 +1,1 @@
+<h2 class="header-title"><?php language_e('cloud_view_page_constructor_UnderConstructionPleaseVisitLa'); ?></h2>

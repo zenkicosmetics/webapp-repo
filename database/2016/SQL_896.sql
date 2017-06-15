@@ -1,0 +1,2 @@
+INSERT INTO `settings` (`SettingCode`, `DefaultValue`, `ActualValue`, `LabelValue`, `ModuleName`, `SettingOrder`, `IsRequired`, `Alias01`, `Alias02`, `Alias03`, `Alias04`, `Alias05`, `description`) VALUES
+('000116', '/var/www/clevvermail_webapp/shared/logs/', '/var/www/clevvermail_webapp/shared/logs/', 'Absolute path for logs files', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'Absolute path for logs files');

@@ -1,0 +1,13 @@
+1001	authenticated
+1002	email_exists
+1003	invalid_credentials
+1004	user_created
+1005	list_available_locations
+1006	save_postboxname_success
+1007	postbox_added
+1008	shipping_invocing_address_added
+1009	customer_not_register
+1010	customer_deleted
+1011	Email containing temporary password sent
+1012	Email not sent
+1013	registration_status

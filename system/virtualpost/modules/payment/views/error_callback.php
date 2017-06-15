@@ -1,0 +1,1 @@
+<p>The registration of your credit card failed, please try again.</p>

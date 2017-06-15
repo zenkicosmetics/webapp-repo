@@ -1,0 +1,10 @@
+-- ALTER TABLE cases_company_information MODIFY comment_content VARCHAR(1000);
+-- ALTER TABLE cases_personal_identity MODIFY comment_content VARCHAR(1000);
+-- ALTER TABLE cases_registration_document MODIFY comment_content VARCHAR(1000);
+-- ALTER TABLE cases_verification_personal_identity MODIFY comment_content VARCHAR(1000);
+-- ALTER TABLE cases_verification_company_hard MODIFY comment_content VARCHAR(1000);
+-- ALTER TABLE cases_verification_usps MODIFY comment_content VARCHAR(1000);
+ALTER TABLE cases_phone_number MODIFY comment_content VARCHAR(1000);
+ALTER TABLE cases_contracts MODIFY comment_content VARCHAR(1000);
+ALTER TABLE cases_company_ems MODIFY comment_content VARCHAR(1000);
+ALTER TABLE cases_proof_business MODIFY comment_content VARCHAR(1000);

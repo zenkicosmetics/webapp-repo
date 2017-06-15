@@ -1,0 +1,1 @@
+<iframe width="<?php echo $width ?><?php echo $unit; ?>" height="<?php echo $height; ?><?php echo $unit; ?>" title="<?php echo $title; ?>" src="<?php echo APContext::getFullBasePath()?>widget?p=<?php echo $code?>&t=<?php echo $type?>" style="border:1px solid gray" ></iframe>

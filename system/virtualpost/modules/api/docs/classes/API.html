@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"/>
+    <meta charset="utf-8"/>
+    <title>API Documentation</title>
+    <meta name="author" content=""/>
+    <meta name="description" content=""/>
+
+    <link href="../css/bootstrap-combined.no-icons.min.css" rel="stylesheet">
+    <link href="../css/font-awesome.min.css" rel="stylesheet">
+    <link href="../css/prism.css" rel="stylesheet" media="all"/>
+    <link href="../css/template.css" rel="stylesheet" media="all"/>
+    
+    <!--[if lt IE 9]>
+    <script src="../js/html5.js"></script>
+    <![endif]-->
+    <script src="../js/jquery-1.11.0.min.js"></script>
+    <script src="../js/ui/1.10.4/jquery-ui.min.js"></script>
+    <script src="../js/bootstrap.min.js"></script>
+    <script src="../js/jquery.smooth-scroll.js"></script>
+    <script src="../js/prism.min.js"></script>
+    <!-- TODO: Add http://jscrollpane.kelvinluck.com/ to style the scrollbars for browsers not using webkit-->
+    <script type="text/javascript">
+    function loadExternalCodeSnippets() {
+        Array.prototype.slice.call(document.querySelectorAll('pre[data-src]')).forEach(function (pre) {
+            var src = pre.getAttribute('data-src');
+            var extension = (src.match(/\.(\w+)$/) || [, ''])[1];
+            var language = 'php';
+
+            var code = document.createElement('code');
+            code.className = 'language-' + language;
+
+            pre.textContent = '';
+
+            code.textContent = 'Loading…';
+
+            pre.appendChild(code);
+
+            var xhr = new XMLHttpRequest();
+
+            xhr.open('GET', src, true);
+
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState == 4) {
+
+                    if (xhr.status < 400 && xhr.responseText) {
+                        code.textContent = xhr.responseText;
+
+                        Prism.highlightElement(code);
+                    }
+                    else if (xhr.status >= 400) {
+                        code.textContent = '✖ Error ' + xhr.status + ' while fetching file: ' + xhr.statusText;
+                    }
+                    else {
+                        code.textContent = '✖ Error: File does not exist or is empty';
+                    }
+                }
+            };
+
+            xhr.send(null);
+        });
+    }
+
+    $(document).ready(function(){
+        loadExternalCodeSnippets();
+    });
+    $('#source-view').on('shown', function () {
+        loadExternalCodeSnippets();
+    })
+</script>
+
+    <link rel="shortcut icon" href="../images/favicon.ico"/>
+    <link rel="apple-touch-icon" href="../images/apple-touch-icon.png"/>
+    <link rel="apple-touch-icon" sizes="72x72" href="../images/apple-touch-icon-72x72.png"/>
+    <link rel="apple-touch-icon" sizes="114x114" href="../images/apple-touch-icon-114x114.png"/>
+</head>
+<body>
+
+<div class="navbar navbar-fixed-top">
+    <div class="navbar-inner">
+        <div class="container">
+            <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+                <i class="icon-ellipsis-vertical"></i>
+            </a>
+            <a class="brand" href="../index.html">API Documentation</a>
+
+            <div class="nav-collapse">
+                <ul class="nav pull-right">
+                                        <li class="dropdown" id="charts-menu">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                            Charts <b class="caret"></b>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li>
+                                <a href="../graphs/class.html">
+                                    <i class="icon-list-alt"></i>&#160;Class hierarchy diagram
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="dropdown" id="reports-menu">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                            Reports <b class="caret"></b>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li>
+                                <a href="../reports/errors.html">
+                                                                                                                                                                                        <i class="icon-list-alt"></i>&#160;Errors <span class="label label-info pull-right">3</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="../reports/markers.html">
+                                                                                                                                                                                        <i class="icon-list-alt"></i>&#160;Markers <span class="label label-info pull-right">0</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="../reports/deprecated.html">
+                                                                                                            <i class="icon-list-alt"></i>&#160;Deprecated <span class="label label-info pull-right">0</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <!--<div class="go_to_top">-->
+    <!--<a href="#___" style="color: inherit">Back to top&#160;&#160;<i class="icon-upload icon-white"></i></a>-->
+    <!--</div>-->
+</div>
+
+<div id="___" class="container-fluid">
+        <section class="row-fluid">
+        <div class="span2 sidebar">
+                                <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle " data-toggle="collapse" data-target="#namespace-1096641804"></a>
+                                <a href="../namespaces/default.html" style="margin-left: 30px; padding-left: 0">\</a>
+            </div>
+            <div id="namespace-1096641804" class="accordion-body collapse in">
+                <div class="accordion-inner">
+
+                    
+                    <ul>
+                                                                                                    <li class="class"><a href="../classes/API.html">API</a></li>
+                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+        </div>
+    </section>
+    <section class="row-fluid">
+        <div class="span10 offset2">
+            <div class="row-fluid">
+                <div class="span8 content class">
+                    <nav>
+                                                <a href="../namespaces/default.html">\</a> <i class="icon-level-up"></i>
+                                            </nav>
+                    <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal"><i class="icon-code"></i></a>
+
+                    <h1><small>\</small>API</h1>
+                    <p><em></em></p>
+                    
+                    
+                                        
+                    <section id="summary">
+                        <h2>Summary</h2>
+                        <section class="row-fluid heading">
+                            <section class="span4">
+                                <a href="#methods">Methods</a>
+                            </section>
+                            <section class="span4">
+                                <a href="#properties">Properties</a>
+                            </section>
+                            <section class="span4">
+                                <a href="#constants">Constants</a>
+                            </section>
+                        </section>
+                        <section class="row-fluid public">
+                            <section class="span4">
+                                                                    <a href="../classes/API.html#method___construct" class="">__construct()</a><br />
+                                                                    <a href="../classes/API.html#method_index" class="">index()</a><br />
+                                                                    <a href="../classes/API.html#method_login" class="">login()</a><br />
+                                                                    <a href="../classes/API.html#method_register" class="">register()</a><br />
+                                                                    <a href="../classes/API.html#method_all_postbox_locations" class="">all_postbox_locations()</a><br />
+                                                                    <a href="../classes/API.html#method_save_postboxname" class="">save_postboxname()</a><br />
+                                                                    <a href="../classes/API.html#method_add_postbox" class="">add_postbox()</a><br />
+                                                                    <a href="../classes/API.html#method_save_address" class="">save_address()</a><br />
+                                                                    <a href="../classes/API.html#method_forgot_pass" class="">forgot_pass()</a><br />
+                                                                    <a href="../classes/API.html#method_check_registration_status" class="">check_registration_status()</a><br />
+                                                                    <a href="../classes/API.html#method_load_envelope" class="">load_envelope()</a><br />
+                                                                    <a href="../classes/API.html#method_add_payment_method" class="">add_payment_method()</a><br />
+                                                            </section>
+                            <section class="span4">
+                                                                    <em>No public properties found</em>
+                                                            </section>
+                            <section class="span4">
+                                                                    <em>No constants found</em>
+                                                            </section>
+                        </section>
+                        <section class="row-fluid protected">
+                            <section class="span4">
+                                                                    <em>No protected methods found</em>
+                                                            </section>
+                            <section class="span4">
+                                                                    <em>No protected properties found</em>
+                                                            </section>
+                            <section class="span4">
+                                <em>N/A</em>
+                            </section>
+                        </section>
+                        <section class="row-fluid private">
+                            <section class="span4">
+                                                                    <em>No private methods found</em>
+                                                            </section>
+                            <section class="span4">
+                                                                    <em>No private properties found</em>
+                                                            </section>
+                            <section class="span4">
+                                <em>N/A</em>
+                            </section>
+                        </section>
+                    </section>
+                </div>
+                <aside class="span4 detailsbar">
+                                        
+                    
+                    <dl>
+                        <dt>File</dt>
+                            <dd><a href="../files/api.html"><div class="path-wrapper">api.php</div></a></dd>
+                                                <dt>Package</dt>
+                            <dd><div class="namespace-wrapper">Default</div></dd>
+                                                <dt>Class hierarchy</dt>
+                            <dd class="hierarchy">
+                                                                                                                                                                                                                                                                                                
+                                        <div class="namespace-wrapper">\MY_Controller</div>
+                                                                                                    <div class="namespace-wrapper">\API</div>
+                            </dd>
+
+                        
+                        
+                        
+                        
+                                                                        </dl>
+                    <h2>Tags</h2>
+                    <table class="table table-condensed">
+                                            <tr><td colspan="2"><em>None found</em></td></tr>
+                                        </table>
+                </aside>
+            </div>
+
+                        
+                        
+                                    <a id="methods" name="methods"></a>
+            <div class="row-fluid">
+                <div class="span8 content class"><h2>Methods</h2></div>
+                <aside class="span4 detailsbar"></aside>
+            </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method___construct" name="method___construct" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">__construct()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">__construct() </pre>
+                <p><em></em></p>
+                
+
+                
+                
+                				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_index" name="method_index" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">index()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">index() : array</pre>
+                <p><em>Verify Web Services are working.</em></p>
+                <p>void</p>
+
+                
+                
+                                    <h4>Returns</h4>
+                    array
+                                            &mdash; <p>{'code' => 1000, 'message' => 'Working'}</p>
+                                    				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_login" name="method_login" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">login()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">login() : array</pre>
+                <p><em>Check login.</em></p>
+                <p>If credentials are correct then return authenticated <br>
+Else If email exists then return email_exists <br>
+Else return invalid_credentials. <br></p>
+
+                
+                
+                                    <h4>Returns</h4>
+                    array
+                                            &mdash; <p>{'code' => 1001, 'message' => 'authenticated', 'result' => array()} or <br>
+{'code' => 1002, 'message' => 'email_exists', 'result' => array()} or <br>
+{'code' => 1003, 'message' => 'invalid_credentials', 'result' => array()}</p>
+                                    				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                                                                            <dt>Uses</dt>
+                                                                <dd>$_POST['email']</dd>
+                                            <dd>$_POST['password']</dd>
+                                                </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_register" name="method_register" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">register()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">register() : array</pre>
+                <p><em>Register customer</em></p>
+                
+
+                
+                
+                                    <h4>Returns</h4>
+                    array
+                                            &mdash; <p>{'code' => 1004, 'message' => 'user_created', 'result' => array()}</p>
+                                    				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                                                                            <dt>Uses</dt>
+                                                                <dd>$_POST['email']</dd>
+                                            <dd>$_POST['password']</dd>
+                                                </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_all_postbox_locations" name="method_all_postbox_locations" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">all_postbox_locations()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">all_postbox_locations() : array</pre>
+                <p><em>Get all avaialable postbox locations</em></p>
+                <p>void</p>
+
+                
+                
+                                    <h4>Returns</h4>
+                    array
+                                            &mdash; <p>{'code' => 1005, 'message' => 'list_available_locations', 'result' => array()}</p>
+                                    				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_save_postboxname" name="method_save_postboxname" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">save_postboxname()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">save_postboxname() : array</pre>
+                <p><em>Save postbox name</em></p>
+                <p>Save postbox name</p>
+
+                
+                
+                                    <h4>Returns</h4>
+                    array
+                                            &mdash; <p>{'code' => 1006, 'message' => 'save_postboxname_success', 'result' => array()}</p>
+                                    				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                                                                            <dt>Uses</dt>
+                                                                <dd>$_POST['email']</dd>
+                                            <dd>$_POST['postbox_name']</dd>
+                                            <dd>$_POST['location_available_id']</dd>
+                                            <dd>$_POST['address_name']</dd>
+                                            <dd>$_POST['address_company_name']</dd>
+                                                </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_add_postbox" name="method_add_postbox" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">add_postbox()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">add_postbox() : array</pre>
+                <p><em>Add postbox.</em></p>
+                <p>adds a postbox to customer account.</p>
+
+                
+                
+                                    <h4>Returns</h4>
+                    array
+                                            &mdash; <p>{'code' => 1007, 'message' => 'postbox_added', 'result' => array()}</p>
+                                    				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                                                                            <dt>Uses</dt>
+                                                                <dd>$_POST['email']</dd>
+                                            <dd>$_POST['location']</dd>
+                                            <dd>$_POST['postboxname']</dd>
+                                            <dd>$_POST['accounttype']</dd>
+                                            <dd>$_POST['customername']</dd>
+                                            <dd>$_POST['companyname']</dd>
+                                                </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_save_address" name="method_save_address" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">save_address()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">save_address() : array</pre>
+                <p><em>Save shipment and invoice address.</em></p>
+                <p>add shipment and invoice address to customer account.</p>
+
+                
+                
+                                    <h4>Returns</h4>
+                    array
+                                            &mdash; <p>{'code' => 1008, 'message' => 'shipping_invocing_address_added', 'result' => array()}</p>
+                                    				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                                                                            <dt>Uses</dt>
+                                                                <dd>$_POST['email']</dd>
+                                            <dd>$_POST['shipment_address_name']</dd>
+                                            <dd>$_POST['shipment_company']</dd>
+                                            <dd>$_POST['shipment_street']</dd>
+                                            <dd>$_POST['shipment_postcode']</dd>
+                                            <dd>$_POST['shipment_city']</dd>
+                                            <dd>$_POST['shipment_region']</dd>
+                                            <dd>$_POST['shipment_country']</dd>
+                                            <dd>$_POST['invoicing_address_name']</dd>
+                                            <dd>$_POST['invoicing_company']</dd>
+                                            <dd>$_POST['invoicing_street']</dd>
+                                            <dd>$_POST['invoicing_postcode']</dd>
+                                            <dd>$_POST['invoicing_city']</dd>
+                                            <dd>$_POST['invoicing_region']</dd>
+                                            <dd>$_POST['invoicing_country']</dd>
+                                                </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_forgot_pass" name="method_forgot_pass" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">forgot_pass()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">forgot_pass() : array</pre>
+                <p><em>Forfot password</em></p>
+                <p>Checks if customer email exists and is not deleted then generate random password and email to customer.</p>
+
+                
+                
+                                    <h4>Returns</h4>
+                    array
+                                            &mdash; <p>{'code' => 1009, 'message' => 'customer_not_register', 'result' => array()} <em>or</em> <br>
+{'code' => 1010, 'message' => 'customer_deleted', 'result' => array()} <em>or</em> <br>
+{'code' => 1011, 'message' => 'Email containing temporary password sent', 'result' => array()} <em>or</em> <br>
+{'code' => 1012, 'message' => 'Email not sent', 'result' => array()}</p>
+                                    				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                                                                            <dt>Uses</dt>
+                                                                <dd>$_POST['email']</dd>
+                                                </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_check_registration_status" name="method_check_registration_status" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">check_registration_status()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">check_registration_status() : array</pre>
+                <p><em>Check Registration Status</em></p>
+                <p>Check if customer is active, filled shipping address, invoicing address, postbox name,
+company address, city, payment details and verified email address.</p>
+
+                
+                
+                                    <h4>Returns</h4>
+                    array
+                                            &mdash; <p>{'code' => 1013, 'message' => 'registration_status', 'result' => array()}</p>
+                                    				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                                                                            <dt>Uses</dt>
+                                                                <dd>$_POST['email']</dd>
+                                                </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_load_envelope" name="method_load_envelope" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">load_envelope()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">load_envelope() : array</pre>
+                <p><em>Load envelope information based on input parameters.</em></p>
+                <p>work to be done....</p>
+
+                
+                
+                                    <h4>Returns</h4>
+                    array
+                                            &mdash; <p>{'code' => 10.., 'message' => '', 'result' => array()}</p>
+                                    				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                                                                            <dt>Uses</dt>
+                                                                <dd>$_POST['p']</dd>
+                                            <dd>$_POST['skip']</dd>
+                                            <dd>$_POST['first_regist']</dd>
+                                            <dd>$_POST['declare_customs']</dd>
+                                            <dd>$_POST['search_type']</dd>
+                                            <dd>$_POST['base_url']</dd>
+                                            <dd>$_POST['fullTextSearchFlag']</dd>
+                                            <dd>$_POST['fullTextSearchValue']</dd>
+                                            <dd>$_POST['start']</dd>
+                                            <dd>$_POST['limit']</dd>
+                                                </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_add_payment_method" name="method_add_payment_method" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">add_payment_method()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">add_payment_method() : array</pre>
+                <p><em>Add new payment method.</em></p>
+                <p>work to be done....</p>
+
+                
+                
+                                    <h4>Returns</h4>
+                    array
+                                            &mdash; <p>{'code' => 10.., 'message' => '', 'result' => array()}</p>
+                                    				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                                                                            <dt>Uses</dt>
+                                                                <dd>$_POST['account_type']</dd>
+                                            <dd>$_POST['card_type']</dd>
+                                            <dd>$_POST['card_number']</dd>
+                                            <dd>$_POST['card_name']</dd>
+                                            <dd>$_POST['cvc']</dd>
+                                            <dd>$_POST['expired_year']</dd>
+                                            <dd>$_POST['expired_month']</dd>
+                                                </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                                                    </div>
+    </section>
+
+    <div id="source-view" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="source-view-label" aria-hidden="true">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+            <h3 id="source-view-label">api.php</h3>
+        </div>
+        <div class="modal-body">
+            <pre data-src="../files/api.php.txt" class="language-php line-numbers"></pre>
+        </div>
+    </div>
+
+    <footer class="row-fluid">
+        <section class="span10 offset2">
+            <section class="row-fluid">
+                <section class="span10 offset1">
+                    <section class="row-fluid footer-sections">
+                        <section class="span4">
+                                                        <h1><i class="icon-code"></i></h1>
+                            <div>
+                                <ul>
+                                                                    </ul>
+                            </div>
+                        </section>
+                        <section class="span4">
+                                                        <h1><i class="icon-bar-chart"></i></h1>
+                            <div>
+                                <ul>
+                                    <li><a href="../graphs/class.html">Class Hierarchy Diagram</a></li>
+                                </ul>
+                            </div>
+                        </section>
+                        <section class="span4">
+                                                        <h1><i class="icon-pushpin"></i></h1>
+                            <div>
+                                <ul>
+                                    <li><a href="../reports/errors.html">Errors</a></li>
+                                    <li><a href="../reports/markers.html">Markers</a></li>
+                                </ul>
+                            </div>
+                        </section>
+                    </section>
+                </section>
+            </section>
+            <section class="row-fluid">
+                <section class="span10 offset1">
+                    <hr />
+                    Documentation is powered by <a href="http://www.phpdoc.org/">phpDocumentor </a> and authored
+                    on February 18th, 2015 at 08:39.
+                </section>
+            </section>
+        </section>
+    </footer>
+</div>
+
+</body>
+</html>
